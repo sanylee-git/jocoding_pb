@@ -53,9 +53,8 @@ class MonthCalendar extends HTMLElement {
         const monthNames = ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"];
         const monthName = monthNames[this._month];
 
-        // --- Calendar Logic ---
         const firstDateOfMonth = new Date(this._year, this._month, 1);
-        const startDay = firstDateOfMonth.getDay() === 0 ? 6 : firstDateOfMonth.getDay() - 1; // 0=Mon, 6=Sun
+        const startDay = firstDateOfMonth.getDay() === 0 ? 6 : firstDateOfMonth.getDay() - 1;
         
         let currentDate = new Date(firstDateOfMonth);
         currentDate.setDate(currentDate.getDate() - startDay);
@@ -84,12 +83,11 @@ class MonthCalendar extends HTMLElement {
                 </tr>
             `;
 
-            if (currentDate.getMonth() > this._month && currentDate.getFullYear() >= this._year || (currentDate.getMonth() === 0 && this._month === 11)) {
+            if ((currentDate.getMonth() > this._month || (currentDate.getMonth() === 0 && this._month === 11)) && currentDate.getFullYear() >= this._year) {
                 done = true;
             }
         }
 
-        // --- Component HTML & CSS ---
         this.shadowRoot.innerHTML = `
             <style>
                 :host { display: block; }
@@ -99,16 +97,15 @@ class MonthCalendar extends HTMLElement {
                 th, td { text-align: center; padding: 0.5rem 0; }
                 th { font-weight: 500; color: var(--muted-text-color); font-size: 0.75rem; }
                 .week-number { color: var(--muted-text-color); font-weight: 500; }
-                .muted { color: var(--muted-text-color); }
+                .muted { color: var(--muted-text-color); opacity: 0.5; }
                 .week-row { cursor: pointer; transition: background-color 0.15s; }
-                .week-row:hover { background-color: rgba(0,0,0,0.05); }
-                html[data-theme="dark"] .week-row:hover { background-color: rgba(255,255,255,0.05); }
+                .week-row:hover { background-color: var(--accent-color); }
                 .week-row.selected {
-                    background-color: var(--accent-color);
-                    color: var(--accent-text-color);
+                    background-color: var(--primary-color);
+                    color: white;
                     font-weight: 600;
                 }
-                .week-row.selected .week-number, .week-row.selected .muted { color: var(--accent-text-color); }
+                .week-row.selected .week-number, .week-row.selected .muted { color: white; opacity: 0.8; }
             </style>
             <div class="calendar-card">
                 <h3 class="month-header">${monthName}</h3>
@@ -123,7 +120,6 @@ class MonthCalendar extends HTMLElement {
             </div>
         `;
 
-        // --- Event Listeners ---
         this.shadowRoot.querySelectorAll('.week-row').forEach(row => {
             row.addEventListener('click', () => {
                 this.dispatchEvent(new CustomEvent('week-selected', {
@@ -184,25 +180,15 @@ document.addEventListener('DOMContentLoaded', () => {
             root.setAttribute('data-theme', theme);
             localStorage.setItem('theme', theme);
         }
-        // Update active button
-        themeSwitcherBtns.forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.themeSwitcher === theme);
-        });
     }
 
     function initializeTheme() {
         const savedTheme = localStorage.getItem('theme');
-        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        let currentTheme = savedTheme || 'system';
-        
-        if (savedTheme) {
-            setTheme(savedTheme);
-        } else {
-            setTheme('system');
-        }
+        setTheme(savedTheme || 'system');
         
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-            if (localStorage.getItem('theme') === null) {
+            // Only update if the theme is set to 'system'
+            if (!localStorage.getItem('theme')) {
                  setTheme('system');
             }
         });
@@ -219,31 +205,4 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Initial Render ---
     initializeTheme();
     renderYear(currentYear);
-
-    // --- Formspree Verification (Temporary) ---
-    async function verifyFormspreeSubmission() {
-        const formData = new FormData();
-        formData.append('name', 'Test User');
-        formData.append('_replyto', 'test@example.com');
-        formData.append('message', 'This is a test message from Gemini CLI.');
-
-        try {
-            const response = await fetch('https://formspree.io/f/xjgerzvd', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'Accept': 'application/json'
-                }
-            });
-            console.log('Formspree verification response:', response);
-            if (response.ok) {
-                console.log('Formspree submission successful!');
-            } else {
-                console.error('Formspree submission failed:', await response.json());
-            }
-        } catch (error) {
-            console.error('Error during Formspree verification:', error);
-        }
-    }
-    verifyFormspreeSubmission();
 });
