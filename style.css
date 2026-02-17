@@ -205,3 +205,43 @@ month-calendar {
     background-color: #3b57a0; /* Darker shade of primary color */
     box-shadow: var(--shadow);
 }
+
+/* Bottom Sections (Form + Disqus) Layout */
+.bottom-sections {
+    display: flex;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.partnership-form-section,
+.disqus-comments-section {
+    flex: 1; /* Allows sections to grow and shrink */
+    min-width: 300px; /* Minimum width before wrapping */
+    background-color: var(--card-background);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: 1.5rem;
+}
+
+.disqus-comments-section h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--header-text-color);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+/* Ensure Disqus thread fits within its container */
+#disqus_thread {
+    padding-top: 1rem;
+}
+
+@media (min-width: 768px) {
+    .bottom-sections {
+        flex-wrap: nowrap; /* Prevent wrapping on larger screens */
+    }
+    .partnership-form-section {
+        margin-top: 0; /* Remove top margin when side-by-side */
+    }
+}

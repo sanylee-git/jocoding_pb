@@ -219,4 +219,31 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Initial Render ---
     initializeTheme();
     renderYear(currentYear);
+
+    // --- Formspree Verification (Temporary) ---
+    async function verifyFormspreeSubmission() {
+        const formData = new FormData();
+        formData.append('name', 'Test User');
+        formData.append('_replyto', 'test@example.com');
+        formData.append('message', 'This is a test message from Gemini CLI.');
+
+        try {
+            const response = await fetch('https://formspree.io/f/xjgerzvd', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            console.log('Formspree verification response:', response);
+            if (response.ok) {
+                console.log('Formspree submission successful!');
+            } else {
+                console.error('Formspree submission failed:', await response.json());
+            }
+        } catch (error) {
+            console.error('Error during Formspree verification:', error);
+        }
+    }
+    verifyFormspreeSubmission();
 });
