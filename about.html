@@ -3,43 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>소개 - 스마트 연차 플래너</title>
+    <title>소개 - CW Calendar</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="theme.css">
+    <script src="theme.js" defer></script>
 </head>
 <body>
     <header class="header">
         <div class="container">
-            <nav class="nav">
-                <a href="index.html" class="nav-item">홈</a>
-                <a href="about.html" class="nav-item active">소개</a>
-                <a href="privacy.html" class="nav-item">개인정보처리방침</a>
-            </nav>
+            <div class="header-left">
+                <h1 class="logo"><a href="index.html">CW Calendar</a></h1>
+                <nav class="nav">
+                    <a href="index.html" class="nav-item">홈</a>
+                    <a href="about.html" class="nav-item active">소개</a>
+                    <a href="privacy.html" class="nav-item">개인정보처리방침</a>
+                </nav>
+            </div>
+            <div class="theme-switcher">
+                <button data-theme-switcher="light">Light</button>
+                <button data-theme-switcher="dark">Dark</button>
+                <button data-theme-switcher="system">System</button>
+            </div>
         </div>
     </header>
 
     <main class="container">
-        <section class="section">
-            <h1 class="section-title">스마트 연차 플래너는?</h1>
+        <section class="content-section" style="margin-top: 3rem;">
+            <h2 class="section-title">CW Calendar 소개</h2>
             <p class="section-text">
-                스마트 연차 플래너는 복잡한 연차 계산과 계획을 손쉽게 도와주는 도구입니다. 저희는 모든 직장인이 소중한 휴가를 100% 활용하여 일과 삶의 균형을 찾고, 재충전의 시간을 갖기를 바랍니다.
+                CW Calendar는 복잡한 프로젝트와 업무 일정을 주차(Calendar Week) 기준으로 명확하게 관리할 수 있도록 돕는 전문적인 도구입니다. 저희는 모든 전문가, 기획자, 매니저분들이 글로벌 표준 방식인 주차 시스템을 통해 업무 효율성을 극대화하고, 보다 체계적으로 스케줄을 관리하기를 바랍니다.
             </p>
             <p class="section-text">
-                이 사이트는 단순히 날짜를 선택하는 것을 넘어, 휴가를 통해 얻을 수 있는 긍정적인 효과와 알찬 휴가를 보내기 위한 다양한 팁을 제공하며 여러분의 완벽한 휴가 계획을 돕습니다. 저희의 목표는 여러분이 번아웃에서 벗어나 매일을 활기차게 보낼 수 있도록 지원하는 것입니다.
+                이 사이트는 단순히 주차 정보를 보여주는 것을 넘어, 효과적인 업무 관리 방법과 생산성을 높이기 위한 다양한 팁을 제공하여 여러분의 성공적인 프로젝트 수행을 돕습니다. 저희의 목표는 여러분이 복잡한 일정 속에서 길을 잃지 않고, 모든 업무를 계획대로 완수할 수 있도록 지원하는 것입니다.
             </p>
         </section>
 
-        <section class="section">
-            <h2 class="section-subtitle">우리의 미션</h2>
+        <section class="content-section">
+            <h2 class="section-title">우리의 미션</h2>
             <p class="section-text">
-                저희의 미션은 모든 사용자가 자신의 휴가를 체계적으로 관리하고, 그 시간을 통해 삶의 질을 높일 수 있도록 돕는 것입니다. 스마트 연차 플래너와 함께라면, 더 이상 휴가 계획이 스트레스가 아닌 즐거운 과정이 될 것입니다.
+                저희의 미션은 모든 사용자가 자신의 업무 스케줄을 주차(CW) 기반으로 체계적으로 관리하고, 이를 통해 프로젝트의 성공 가능성을 높일 수 있도록 돕는 것입니다. CW Calendar와 함께라면, 더 이상 스케줄 관리가 스트레스가 아닌, 성공을 위한 즐거운 과정이 될 것입니다.
             </p>
         </section>
     </main>
 
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2024 스마트 연차 플래너. All Rights Reserved.</p>
+            <p>&copy; 2024 CW Calendar. All Rights Reserved.</p>
             <nav class="nav">
                 <a href="index.html" class="nav-item">홈</a>
                 <a href="about.html" class="nav-item">소개</a>

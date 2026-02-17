@@ -8,14 +8,16 @@ function getISOWeek(date) {
 }
 
 function getDatesForWeek(weekId) {
+    if (!weekId) return { start: null, end: null };
     const [year, weekNumber] = weekId.split('-').map(Number);
     const simple = new Date(year, 0, 1 + (weekNumber - 1) * 7);
     const dayOfWeek = simple.getDay();
     const isoWeekStart = simple;
-    if (dayOfWeek <= 4)
+    if (dayOfWeek <= 4) {
         isoWeekStart.setDate(simple.getDate() - simple.getDay() + 1);
-    else
+    } else {
         isoWeekStart.setDate(simple.getDate() + 8 - simple.getDay());
+    }
     
     const weekEnd = new Date(isoWeekStart);
     weekEnd.setDate(weekEnd.getDate() + 6);
@@ -53,6 +55,10 @@ class MonthCalendar extends HTMLElement {
         const monthNames = ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"];
         const monthName = monthNames[this._month];
 
+        // Create a set of holiday dates for efficient lookup
+        const yearHolidays = (holidays[this._year]?.KR || []).concat(holidays[this._year]?.US || []);
+        const holidaySet = new Set(yearHolidays.map(h => h.date));
+
         const firstDateOfMonth = new Date(this._year, this._month, 1);
         const startDay = firstDateOfMonth.getDay() === 0 ? 6 : firstDateOfMonth.getDay() - 1;
         
@@ -67,7 +73,16 @@ class MonthCalendar extends HTMLElement {
             
             for (let i = 0; i < 7; i++) {
                 daysInWeek.push(new Date(currentDate));
-                weekRowHtml += `<td class="${currentDate.getMonth() !== this._month ? 'muted' : ''}">${currentDate.getDate()}</td>`;
+                const dayOfWeek = currentDate.getDay();
+                const dateString = formatDate(currentDate);
+                
+                let classes = [];
+                if (currentDate.getMonth() !== this._month) classes.push('muted');
+                if (dayOfWeek === 6) classes.push('saturday');
+                if (dayOfWeek === 0) classes.push('sunday');
+                if (holidaySet.has(dateString)) classes.push('holiday');
+
+                weekRowHtml += `<td class="${classes.join(' ')}">${currentDate.getDate()}</td>`;
                 currentDate.setDate(currentDate.getDate() + 1);
             }
             
@@ -83,7 +98,10 @@ class MonthCalendar extends HTMLElement {
                 </tr>
             `;
 
-            if ((currentDate.getMonth() > this._month || (currentDate.getMonth() === 0 && this._month === 11)) && currentDate.getFullYear() >= this._year) {
+            if (currentDate.getMonth() > this._month && currentDate.getFullYear() >= this._year) {
+                done = true;
+            }
+            if (this._month === 11 && currentDate.getFullYear() > this._year) {
                 done = true;
             }
         }
@@ -98,6 +116,10 @@ class MonthCalendar extends HTMLElement {
                 th { font-weight: 500; color: var(--muted-text-color); font-size: 0.75rem; }
                 .week-number { color: var(--muted-text-color); font-weight: 500; }
                 .muted { color: var(--muted-text-color); opacity: 0.5; }
+                /* Day-specific colors */
+                .saturday { color: var(--saturday-color); }
+                .sunday, .holiday { color: var(--sunday-holiday-color); font-weight: 600; }
+                /* Row styles */
                 .week-row { cursor: pointer; transition: background-color 0.15s; }
                 .week-row:hover { background-color: var(--accent-color); }
                 .week-row.selected {
@@ -105,7 +127,11 @@ class MonthCalendar extends HTMLElement {
                     color: white;
                     font-weight: 600;
                 }
-                .week-row.selected .week-number, .week-row.selected .muted { color: white; opacity: 0.8; }
+                /* Reset colors for selected row */
+                .week-row.selected td, .week-row.selected .week-number, .week-row.selected .muted {
+                    color: white; 
+                }
+                .week-row.selected .muted { opacity: 0.8; }
             </style>
             <div class="calendar-card">
                 <h3 class="month-header">${monthName}</h3>
@@ -140,7 +166,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const prevYearBtn = document.getElementById('prev-year');
     const nextYearBtn = document.getElementById('next-year');
     const gridContainer = document.getElementById('calendar-grid-container');
-    const themeSwitcherBtns = document.querySelectorAll('[data-theme-switcher]');
 
     let currentYear = new Date().getFullYear();
     let selectedWeekId = null;
@@ -153,7 +178,10 @@ document.addEventListener('DOMContentLoaded', () => {
             monthCard.setAttribute('year', year);
             monthCard.setAttribute('month', i);
             if (selectedWeekId) {
-                monthCard.setAttribute('selected-week', selectedWeekId);
+                const [selectedYear] = selectedWeekId.split('-');
+                if (selectedYear == year) {
+                    monthCard.setAttribute('selected-week', selectedWeekId);
+                }
             }
             gridContainer.appendChild(monthCard);
         }
@@ -169,40 +197,12 @@ document.addEventListener('DOMContentLoaded', () => {
             cal.setAttribute('selected-week', selectedWeekId);
         });
     }
-    
-    // --- Theme Logic ---
-    function setTheme(theme) {
-        const root = document.documentElement;
-        if (theme === 'system') {
-            root.removeAttribute('data-theme');
-            localStorage.removeItem('theme');
-        } else {
-            root.setAttribute('data-theme', theme);
-            localStorage.setItem('theme', theme);
-        }
-    }
-
-    function initializeTheme() {
-        const savedTheme = localStorage.getItem('theme');
-        setTheme(savedTheme || 'system');
-        
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-            // Only update if the theme is set to 'system'
-            if (!localStorage.getItem('theme')) {
-                 setTheme('system');
-            }
-        });
-    }
 
     // --- Event Listeners ---
     prevYearBtn.addEventListener('click', () => { currentYear--; renderYear(currentYear); });
     nextYearBtn.addEventListener('click', () => { currentYear++; renderYear(currentYear); });
     gridContainer.addEventListener('week-selected', (e) => { updateSelection(e.detail.weekId); });
-    themeSwitcherBtns.forEach(btn => {
-        btn.addEventListener('click', () => setTheme(btn.dataset.themeSwitcher));
-    });
 
     // --- Initial Render ---
-    initializeTheme();
     renderYear(currentYear);
 });

@@ -11,6 +11,8 @@
     --border-radius: 0.75rem;
     --font-family: 'Noto Sans KR', sans-serif;
     --primary-color: #007bff;
+    --saturday-color: #0056b3;
+    --sunday-holiday-color: #d93025;
 }
 
 html[data-theme="dark"] {
@@ -23,6 +25,8 @@ html[data-theme="dark"] {
     --accent-text-color: #90caff;
     --border-color: #424242;
     --primary-color: #3a96ff;
+    --saturday-color: #90caff;
+    --sunday-holiday-color: #f28b82;
 }
 
 *, *::before, *::after {
@@ -62,8 +66,14 @@ body {
     height: 4.5rem;
 }
 
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
 .logo a {
-    font-size: 1.5rem;
+    font-size: 1.75rem;
     font-weight: 700;
     color: var(--header-text-color);
     text-decoration: none;
@@ -190,14 +200,6 @@ body {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 }
 
-month-calendar {
-    display: block;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    padding: 1.5rem;
-    background-color: var(--background-color);
-}
-
 /* Content Sections */
 .content-sections {
     display: grid;
@@ -223,9 +225,28 @@ month-calendar {
     display: inline-block;
 }
 
+.section-subtitle {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--header-text-color);
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
 .section-text {
     font-size: 1rem;
     color: var(--text-color);
+}
+.section-text + .section-text {
+    margin-top: 1rem;
+}
+
+.list {
+    padding-left: 1.5rem;
+}
+
+.list-item {
+    margin-bottom: 0.5rem;
 }
 
 .tips-list {
@@ -274,23 +295,27 @@ month-calendar {
 }
 
 @media (max-width: 767px) {
-    body {
-        padding: 0;
-    }
     .container {
         padding: 0 1rem;
     }
     .header {
-        position: relative;
+        position: sticky;
     }
     .header .container {
-        flex-direction: column;
-        height: auto;
-        padding: 1rem;
+        flex-direction: row;
+        height: 4.5rem;
+        padding: 0 1rem;
+    }
+    .header-left {
+        gap: 1rem;
     }
     .logo a {
-        margin-bottom: 1rem;
+        font-size: 1.2rem;
     }
+    .nav {
+        display: none; /* Hide nav links, can be replaced with a hamburger menu */
+    }
+
     .hero-title {
         font-size: 2rem;
     }
@@ -298,9 +323,16 @@ month-calendar {
         padding: 1rem;
     }
     .app-header {
-        flex-direction: column;
+        flex-direction: row; /* Revert to row for smaller app header */
+        justify-content: space-between;
+        align-items: center;
         gap: 1rem;
     }
+
+    .current-year {
+        font-size: 1.5rem;
+    }
+
     .year-nav-btn {
         width: 2.5rem;
         height: 2.5rem;
@@ -312,5 +344,10 @@ month-calendar {
     .footer .container {
         flex-direction: column;
         text-align: center;
+    }
+
+    .footer .nav {
+        justify-content: center;
+        margin-top: 1rem;
     }
 }
