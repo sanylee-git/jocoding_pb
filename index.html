@@ -1,14 +1,28 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hello World</title>
-  <link href='/style.css' rel='stylesheet'>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CW (Current Week) Viewer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Hello, world!</h1>
-  <button onclick="console.log('hello');">Press me</button>
-  <script defer type="text/javascript" src="/main.js"></script>
+    <main id="app-container">
+        <header class="app-header">
+            <p id="selected-date-display">오늘</p>
+            <h1 id="cw-display">CW --</h1>
+        </header>
+
+        <div id="year-selector" class="year-selector">
+            <!-- Year buttons will be dynamically inserted here -->
+        </div>
+
+        <calendar-view></calendar-view>
+
+    </main>
+    <script src="main.js" type="module"></script>
 </body>
 </html>

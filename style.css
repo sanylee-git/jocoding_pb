@@ -1,1 +1,100 @@
-/* Add styles here */
+:root {
+    --background-color: #f0f2f5;
+    --card-background: #ffffff;
+    --text-color: #1c1e21;
+    --primary-color: #4a69bd;
+    --secondary-text-color: #65676b;
+    --highlight-color: #e7f3ff;
+    --border-color: #dddfe2;
+    --font-family: 'Inter', sans-serif;
+    --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --shadow-deep: 0 8px 24px rgba(0, 0, 0, 0.15);
+    --border-radius: 12px;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-family: var(--font-family);
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 1rem;
+}
+
+#app-container {
+    width: 100%;
+    max-width: 420px;
+    background: var(--card-background);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-deep);
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.app-header {
+    text-align: center;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1.5rem;
+}
+
+#selected-date-display {
+    color: var(--secondary-text-color);
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+#cw-display {
+    color: var(--primary-color);
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.year-selector {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.year-selector button {
+    font-family: var(--font-family);
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    background-color: transparent;
+    color: var(--secondary-text-color);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.year-selector button:hover {
+    background-color: var(--highlight-color);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.year-selector button.active {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-soft);
+}
+
+/* Styles for the calendar-view component will be defined within its shadow DOM */
