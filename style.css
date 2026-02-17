@@ -12,6 +12,17 @@
     --font-family: 'Inter', sans-serif;
 }
 
+html[data-theme="dark"] {
+    --background-color: #1a1a1a;
+    --card-background: #2c2c2c;
+    --text-color: #e8e6e3;
+    --muted-text-color: #8f8f8f;
+    --header-text-color: #c7c7c7;
+    --accent-color: #004085;
+    --accent-text-color: #cfe2ff;
+    --border-color: #4d4d4d;
+}
+
 *, *::before, *::after {
     box-sizing: border-box;
     margin: 0;
@@ -23,10 +34,11 @@ body {
     background-color: var(--background-color);
     color: var(--text-color);
     padding: 1rem;
+    transition: background-color 0.2s, color 0.2s;
 }
 
 .app-container {
-    max-width: 1600px;
+    max-width: 1400px;
     margin: 0 auto;
 }
 
@@ -39,10 +51,13 @@ body {
     border-radius: var(--border-radius);
     margin-bottom: 1.5rem;
     box-shadow: var(--shadow);
+    transition: background-color 0.2s;
+    position: relative;
 }
 
 .header-content {
     text-align: center;
+    flex-grow: 1;
 }
 
 #current-year-display {
@@ -52,9 +67,10 @@ body {
 }
 
 #selected-week-display {
-    font-size: 1rem;
+    font-size: 0.9rem;
     color: var(--muted-text-color);
     margin-top: 0.25rem;
+    min-height: 1.2rem;
 }
 
 .year-nav-btn {
@@ -66,17 +82,16 @@ body {
     font-size: 1.25rem;
     color: var(--header-text-color);
     cursor: pointer;
-    transition: background-color 0.2s, color 0.2s;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
 }
 
 .year-nav-btn:hover {
-    background-color: #e9ecef;
+    background-color: rgba(0,0,0,0.05);
 }
 
 #calendar-grid-container {
     display: grid;
     gap: 1.5rem;
-    /* Responsive Grid */
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 }
 
@@ -92,13 +107,11 @@ body {
     }
 }
 
-
-/* Styles for the month-calendar component will be defined within its shadow DOM */
-/* But we can define a basic card style here */
 month-calendar {
     display: block;
     background-color: var(--card-background);
     border-radius: var(--border-radius);
     box-shadow: var(--shadow);
     padding: 1rem;
+    transition: background-color 0.2s;
 }

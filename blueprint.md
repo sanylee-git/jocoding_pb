@@ -4,65 +4,61 @@
 
 This project is evolving from a simple CW viewer into a professional, reusable **Yearly Week Selector** component. It is designed for use in data analytics dashboards where users need to filter time-series data by selecting a specific week.
 
-The component displays a full year at a glance, with all 12 months presented as individual cards in a responsive grid. The core interaction is centered around selecting an entire week (Monday to Sunday) globally. The design prioritizes a clean, information-dense, and modern SaaS aesthetic.
+The component displays a full year at a glance, with all 12 months presented as individual cards in a responsive grid. The core interaction is centered around selecting an entire week (Monday to Sunday) globally. The design prioritizes a clean, information-dense, and modern SaaS aesthetic, now with added theme support and enhanced display details.
 
 ## 2. Design & Features
 
-The component is being re-imagined as a high-fidelity dashboard element.
+The component is being re-imagined as a high-fidelity dashboard element with further refinements.
 
 ### 2.1. Visual Design
 - **Aesthetic:** Clean, modern, and professional SaaS/data dashboard.
 - **Layout:** A full-width container housing a responsive grid of 12 month cards.
-  - **Desktop:** 4 columns x 3 rows.
-  - **Tablet:** 2 columns.
-  - **Mobile:** 1 column (stacked).
-- **Color Palette:**
-  - `--background-color`: `#f8f9fa` (Soft gray)
+- **Compactness:** The main application container will have a `max-width` (e.g., 1400px) to prevent the layout from stretching uncomfortably on very wide screens, ensuring a more focused and readable view.
+- **Theming:**
+  - **Light/Dark/System Modes:** The component will support manual switching between a light theme (default) and a full dark theme. A "System" option will respect the user's OS-level preference.
+  - **Theme Switcher:** A simple, unobtrusive UI control will be added to the main header to manage theme selection.
+- **Color Palette (Light - Default):**
+  - `--background-color`: `#f8f9fa`
   - `--card-background`: `#ffffff`
-  - `--text-color`: `#212529` (Neutral dark gray)
-  - `--muted-text-color`: `#adb5bd` (For overflow days)
+  - `--text-color`: `#212529`
+  - `--muted-text-color`: `#adb5bd`
   - `--header-text-color`: `#495057`
-  - `--accent-color`: `#cfe2ff` (Subtle blue for selection highlight)
+  - `--accent-color`: `#cfe2ff`
+  - `--accent-text-color`: `#004085`
   - `--border-color`: `#dee2e6`
-- **Typography:** A neutral, sans-serif font like 'Inter'. The layout will be dense and information-efficient, using smaller font sizes.
-- **Effects:**
-  - `box-shadow`: Very subtle shadows on cards to lift them from the background.
-  - `border-radius`: Standardized rounded corners for all cards and interactive elements.
+- **Color Palette (Dark):**
+  - `--background-color`: `#1a1a1a`
+  - `--card-background`: `#2c2c2c`
+  - `--text-color`: `#e8e6e3`
+  - `--muted-text-color`: `#8f8f8f`
+  - `--header-text-color`: `#c7c7c7`
+  - `--accent-color`: `#004085`
+  - `--accent-text-color`: `#cfe2ff`
+  - `--border-color`: `#4d4d4d`
+- **Typography:** A neutral, sans-serif font like 'Inter'.
+- **Effects:** Subtle `box-shadow` and `border-radius` for a clean, card-based UI.
 
 ### 2.2. Core Features
-- **Main Header:** A global header will display the current year and the selected week.
-  - e.g., `<h2>2026</h2><p>Selected: CW 35</p>`
-- **Year Navigation:** Simple `<` and `>` icon buttons to navigate between years.
-- **Month Cards (`<month-calendar>`):**
-  - Each card represents one month and is a custom Web Component.
-  - **Header:** Displays the month name (e.g., "February").
-  - **Calendar Table:**
-    - **Week Starts Monday:** Adheres to the ISO-8601 standard.
-    - **Columns:** The table will have 8 columns: `CW | Mo | Tu | We | Th | Fr | Sa | Su`.
-    - **Week Numbers:** The first column of each row will display the ISO week number.
-    - **Overflow Days:** Days from adjacent months that complete a week are displayed with muted text.
-- **Interaction:**
-  - **Global Week Selection:** Clicking any part of a week row (`<tr>`) selects that week across the entire application.
-  - **Single Source of Truth:** Only one week can be active at any time.
-  - **Output:** The component's state (selected year and week number) is clearly displayed in the main header.
+- **Main Header:** A global header displays the current year and the selected week.
+- **Year Navigation:** Simple icon buttons for year-over-year navigation.
+- **Enhanced Selection Display:** The selected week's display is now more informative.
+  - **Format:** `선택: {Year}년 CW{Week} · {YYYY-MM-DD}~{YYYY-MM-DD}`
+  - **Example:** `선택: 2026년 CW9 · 2026-02-23~2026-03-01`
+- **Month Cards (`<month-calendar>`):** The core component for displaying each month's calendar.
 
 ## 3. Architecture & Implementation
-
-The architecture will be refactored to support the new component-based, full-year view.
-
-- **HTML (`index.html`):** Provides the main application shell, including the header, year navigation controls, and a grid container for the month cards.
-- **CSS (`style.css`):** Completely rewritten to implement the new responsive grid, card styling, and overall SaaS dashboard aesthetic.
+- **HTML (`index.html`):** The main shell, now including controls for the theme switcher in the header.
+- **CSS (`style.css`):** Will be updated with a `max-width` for the container and a full set of dark mode color variables under an `html[data-theme="dark"]` selector.
 - **JavaScript (`main.js`):**
-  - **`<month-calendar>` Web Component:** A new, highly specialized component to render a single month's calendar based on the new requirements. It will manage its own rendering but will be controlled by global state.
-  - **Global State Management:** The main script will manage the `currentYear` and `selectedWeek` (e.g., `{year, weekNumber}`).
-  - **Event-Driven:** The `<month-calendar>` components will emit a `week-selected` event. The main script will listen for this, update the global state, and then instruct all 12 components to re-synchronize their display to show the new selection.
+  - **Theme Logic:** New functions to manage theme state (Light/Dark/System), handle user selection, and persist the choice in `localStorage`.
+  - **Date Range Calculation:** A new helper function, `getDatesForWeek(weekId)`, will be created to calculate the start (Monday) and end (Sunday) dates for a given ISO week.
+  - **State Management:** The main script continues to manage `currentYear` and `selectedWeek`. The `updateSelection` function will be enhanced to use the new date range calculation.
 
 ## 4. Current Development Plan
 
-1.  **[completed]** Update the `blueprint.md` file with the new project vision.
-2.  **[in_progress]** Restructure `index.html` for the yearly grid view.
-3.  **[pending]** Rewrite `style.css` for the new SaaS dashboard aesthetic.
-4.  **[pending]** Create a new `<month-calendar>` Web Component in `main.js`.
-5.  **[pending]** Implement new calendar logic (Monday start, week numbers, overflow days).
-6.  **[pending]** Manage global week selection state and interactions.
-7.  **[pending]** Deploy the final component.
+1.  **[completed]** Update `blueprint.md` with new UI/UX enhancements.
+2.  **[in_progress]** Refine `style.css` for compactness and add a full dark mode theme.
+3.  **[pending]** Add theme switcher controls to `index.html`.
+4.  **[pending]** Implement theme switching logic in `main.js`.
+5.  **[pending]** Implement logic to calculate and display the week's date range.
+6.  **[pending]** Commit and deploy the final polished version.

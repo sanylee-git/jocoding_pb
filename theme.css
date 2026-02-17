@@ -1,0 +1,29 @@
+.theme-switcher {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    display: flex;
+    background-color: var(--background-color);
+    border-radius: 20px;
+    padding: 0.25rem;
+    border: 1px solid var(--border-color);
+}
+
+.theme-switcher button {
+    font-family: var(--font-family);
+    font-size: 0.75rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 16px;
+    border: none;
+    background-color: transparent;
+    color: var(--muted-text-color);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.theme-switcher button.active {
+    background-color: var(--card-background);
+    color: var(--text-color);
+    font-weight: 500;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}

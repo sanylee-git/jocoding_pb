@@ -7,6 +7,26 @@ function getISOWeek(date) {
     return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
 }
 
+function getDatesForWeek(weekId) {
+    const [year, weekNumber] = weekId.split('-').map(Number);
+    const simple = new Date(year, 0, 1 + (weekNumber - 1) * 7);
+    const dayOfWeek = simple.getDay();
+    const isoWeekStart = simple;
+    if (dayOfWeek <= 4)
+        isoWeekStart.setDate(simple.getDate() - simple.getDay() + 1);
+    else
+        isoWeekStart.setDate(simple.getDate() + 8 - simple.getDay());
+    
+    const weekEnd = new Date(isoWeekStart);
+    weekEnd.setDate(weekEnd.getDate() + 6);
+
+    return { start: isoWeekStart, end: weekEnd };
+}
+
+function formatDate(date) {
+    return date.toISOString().split('T')[0];
+}
+
 // --- Web Component: <month-calendar> ---
 class MonthCalendar extends HTMLElement {
     constructor() {
@@ -74,20 +94,21 @@ class MonthCalendar extends HTMLElement {
             <style>
                 :host { display: block; }
                 .calendar-card { font-size: 0.875rem; }
-                .month-header { font-size: 1rem; font-weight: 600; text-align: center; margin-bottom: 1rem; }
+                .month-header { font-size: 1rem; font-weight: 600; text-align: center; margin-bottom: 1rem; color: var(--header-text-color); }
                 table { width: 100%; border-collapse: collapse; }
                 th, td { text-align: center; padding: 0.5rem 0; }
-                th { font-weight: 500; color: var(--header-text-color, #495057); font-size: 0.75rem; }
-                .week-number { color: var(--muted-text-color, #adb5bd); font-weight: 500; }
-                .muted { color: var(--muted-text-color, #adb5bd); }
+                th { font-weight: 500; color: var(--muted-text-color); font-size: 0.75rem; }
+                .week-number { color: var(--muted-text-color); font-weight: 500; }
+                .muted { color: var(--muted-text-color); }
                 .week-row { cursor: pointer; transition: background-color 0.15s; }
-                .week-row:hover { background-color: #f1f3f5; }
+                .week-row:hover { background-color: rgba(0,0,0,0.05); }
+                html[data-theme="dark"] .week-row:hover { background-color: rgba(255,255,255,0.05); }
                 .week-row.selected {
-                    background-color: var(--accent-color, #cfe2ff);
-                    color: var(--accent-text-color, #004085);
+                    background-color: var(--accent-color);
+                    color: var(--accent-text-color);
                     font-weight: 600;
                 }
-                .week-row.selected .week-number { color: var(--accent-text-color, #004085); }
+                .week-row.selected .week-number, .week-row.selected .muted { color: var(--accent-text-color); }
             </style>
             <div class="calendar-card">
                 <h3 class="month-header">${monthName}</h3>
@@ -123,6 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const prevYearBtn = document.getElementById('prev-year');
     const nextYearBtn = document.getElementById('next-year');
     const gridContainer = document.getElementById('calendar-grid-container');
+    const themeSwitcherBtns = document.querySelectorAll('[data-theme-switcher]');
 
     let currentYear = new Date().getFullYear();
     let selectedWeekId = null;
@@ -144,29 +166,57 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateSelection(weekId) {
         selectedWeekId = weekId;
         const [year, week] = weekId.split('-');
-        weekDisplay.textContent = `선택: ${year}년 CW${week}`;
+        const dates = getDatesForWeek(weekId);
+        weekDisplay.textContent = `선택: ${year}년 CW${week} · ${formatDate(dates.start)} ~ ${formatDate(dates.end)}`;
         
-        // Propagate selection to all child components
         gridContainer.querySelectorAll('month-calendar').forEach(cal => {
             cal.setAttribute('selected-week', selectedWeekId);
         });
     }
+    
+    // --- Theme Logic ---
+    function setTheme(theme) {
+        const root = document.documentElement;
+        if (theme === 'system') {
+            root.removeAttribute('data-theme');
+            localStorage.removeItem('theme');
+        } else {
+            root.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+        }
+        // Update active button
+        themeSwitcherBtns.forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.themeSwitcher === theme);
+        });
+    }
+
+    function initializeTheme() {
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        let currentTheme = savedTheme || 'system';
+        
+        if (savedTheme) {
+            setTheme(savedTheme);
+        } else {
+            setTheme('system');
+        }
+        
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+            if (localStorage.getItem('theme') === null) {
+                 setTheme('system');
+            }
+        });
+    }
 
     // --- Event Listeners ---
-    prevYearBtn.addEventListener('click', () => {
-        currentYear--;
-        renderYear(currentYear);
-    });
-
-    nextYearBtn.addEventListener('click', () => {
-        currentYear++;
-        renderYear(currentYear);
-    });
-
-    gridContainer.addEventListener('week-selected', (e) => {
-        updateSelection(e.detail.weekId);
+    prevYearBtn.addEventListener('click', () => { currentYear--; renderYear(currentYear); });
+    nextYearBtn.addEventListener('click', () => { currentYear++; renderYear(currentYear); });
+    gridContainer.addEventListener('week-selected', (e) => { updateSelection(e.detail.weekId); });
+    themeSwitcherBtns.forEach(btn => {
+        btn.addEventListener('click', () => setTheme(btn.dataset.themeSwitcher));
     });
 
     // --- Initial Render ---
+    initializeTheme();
     renderYear(currentYear);
 });

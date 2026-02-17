@@ -8,16 +8,26 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="theme.css">
 </head>
 <body>
     <div class="app-container">
         <header class="app-header">
-            <button id="prev-year" class="year-nav-btn">&lt;</button>
+            <div class="header-left">
+                 <button id="prev-year" class="year-nav-btn">&lt;</button>
+            </div>
             <div class="header-content">
                 <h2 id="current-year-display">2026</h2>
                 <p id="selected-week-display">선택된 주 없음</p>
             </div>
-            <button id="next-year" class="year-nav-btn">&gt;</button>
+            <div class="header-right">
+                <button id="next-year" class="year-nav-btn">&gt;</button>
+                 <div class="theme-switcher">
+                    <button data-theme-switcher="light">Light</button>
+                    <button data-theme-switcher="dark">Dark</button>
+                    <button data-theme-switcher="system">System</button>
+                </div>
+            </div>
         </header>
 
         <main id="calendar-grid-container">
@@ -28,3 +38,4 @@
     <script src="main.js" type="module"></script>
 </body>
 </html>
+
