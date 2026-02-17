@@ -1,22 +1,22 @@
-# Project Blueprint: Yearly Week Selector Component
+# Project Blueprint: Yearly Week Selector Component & Partnership Inquiry Form
 
 ## 1. Overview
 
-This project is evolving from a simple CW viewer into a professional, reusable **Yearly Week Selector** component. It is designed for use in data analytics dashboards where users need to filter time-series data by selecting a specific week.
+This project provides a professional, reusable **Yearly Week Selector** component for data analytics dashboards, and now includes a **Partnership Inquiry Form**.
 
-The component displays a full year at a glance, with all 12 months presented as individual cards in a responsive grid. The core interaction is centered around selecting an entire week (Monday to Sunday) globally. The design prioritizes a clean, information-dense, and modern SaaS aesthetic, now with added theme support and enhanced display details.
+The week selector component displays a full year at a glance, with all 12 months presented as individual cards in a responsive grid. The core interaction is centered around selecting an entire week (Monday to Sunday) globally. The design prioritizes a clean, information-dense, and modern SaaS aesthetic, now with added theme support and enhanced display details.
+
+The partnership inquiry form offers a simple, modern, and user-friendly way for users to contact for collaborations, utilizing Formspree for backend submission handling.
 
 ## 2. Design & Features
 
-The component is being re-imagined as a high-fidelity dashboard element with further refinements.
+The component and form are designed as high-fidelity dashboard elements with further refinements.
 
 ### 2.1. Visual Design
 - **Aesthetic:** Clean, modern, and professional SaaS/data dashboard.
-- **Layout:** A full-width container housing a responsive grid of 12 month cards.
-- **Compactness:** The main application container will have a `max-width` (e.g., 1400px) to prevent the layout from stretching uncomfortably on very wide screens, ensuring a more focused and readable view.
-- **Theming:**
-  - **Light/Dark/System Modes:** The component will support manual switching between a light theme (default) and a full dark theme. A "System" option will respect the user's OS-level preference.
-  - **Theme Switcher:** A simple, unobtrusive UI control will be added to the main header to manage theme selection.
+- **Layout:** A full-width container housing a responsive grid of 12 month cards and a dedicated section for the partnership form.
+- **Compactness:** The main application container will have a `max-width` (e.g., 1400px) to ensure a focused and readable view.
+- **Theming:** Light/Dark/System Modes with a UI control for selection.
 - **Color Palette (Light - Default):**
   - `--background-color`: `#f8f9fa`
   - `--card-background`: `#ffffff`
@@ -45,20 +45,21 @@ The component is being re-imagined as a high-fidelity dashboard element with fur
   - **Format:** `선택: {Year}년 CW{Week} · {YYYY-MM-DD}~{YYYY-MM-DD}`
   - **Example:** `선택: 2026년 CW9 · 2026-02-23~2026-03-01`
 - **Month Cards (`<month-calendar>`):** The core component for displaying each month's calendar.
+- **Partnership Inquiry Form:**
+  - A dedicated section with a clear "제휴 문의" (Partnership Inquiry) heading.
+  - Fields: `이름` (Name), `이메일` (Email), `메시지` (Message - a textarea).
+  - A submit button (`제출`).
+  - Uses `https://formspree.io/f/xjgerzvd` as the submission endpoint.
+  - Styled to fit the overall modern, clean aesthetic.
 
 ## 3. Architecture & Implementation
-- **HTML (`index.html`):** The main shell, now including controls for the theme switcher in the header.
-- **CSS (`style.css`):** Will be updated with a `max-width` for the container and a full set of dark mode color variables under an `html[data-theme="dark"]` selector.
-- **JavaScript (`main.js`):**
-  - **Theme Logic:** New functions to manage theme state (Light/Dark/System), handle user selection, and persist the choice in `localStorage`.
-  - **Date Range Calculation:** A new helper function, `getDatesForWeek(weekId)`, will be created to calculate the start (Monday) and end (Sunday) dates for a given ISO week.
-  - **State Management:** The main script continues to manage `currentYear` and `selectedWeek`. The `updateSelection` function will be enhanced to use the new date range calculation.
+- **HTML (`index.html`):** The main shell, including theme switcher controls, calendar grid, and the new partnership inquiry form section.
+- **CSS (`style.css`):** Updated with `max-width` for the container, full dark mode color variables, and styling for the new form elements.
+- **JavaScript (`main.js`):** Contains theme logic, date range calculation, and state management for the week selector. No direct changes for the form submission are needed here, as Formspree handles it.
 
 ## 4. Current Development Plan
 
-1.  **[completed]** Update `blueprint.md` with new UI/UX enhancements.
-2.  **[in_progress]** Refine `style.css` for compactness and add a full dark mode theme.
-3.  **[pending]** Add theme switcher controls to `index.html`.
-4.  **[pending]** Implement theme switching logic in `main.js`.
-5.  **[pending]** Implement logic to calculate and display the week's date range.
-6.  **[pending]** Commit and deploy the final polished version.
+1.  **[completed]** Update `blueprint.md` with the new partnership inquiry form feature.
+2.  **[in_progress]** Add the partnership inquiry form HTML to `index.html`.
+3.  **[pending]** Add styles for the new form in `style.css`.
+4.  **[pending]** Commit and deploy the changes.

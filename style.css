@@ -55,6 +55,12 @@ body {
     position: relative;
 }
 
+.header-left, .header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
 .header-content {
     text-align: center;
     flex-grow: 1;
@@ -88,11 +94,15 @@ body {
 .year-nav-btn:hover {
     background-color: rgba(0,0,0,0.05);
 }
+html[data-theme="dark"] .year-nav-btn:hover {
+    background-color: rgba(255,255,255,0.1);
+}
 
 #calendar-grid-container {
     display: grid;
     gap: 1.5rem;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    margin-bottom: 1.5rem;
 }
 
 @media (min-width: 1400px) {
@@ -114,4 +124,84 @@ month-calendar {
     box-shadow: var(--shadow);
     padding: 1rem;
     transition: background-color 0.2s;
+}
+
+/* Partnership Form Section */
+.partnership-form-section {
+    background-color: var(--card-background);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.partnership-form-section h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--header-text-color);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-color);
+    margin-bottom: 0.4rem;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group textarea {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    font-family: var(--font-family);
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary-color, #4a69bd); /* Use a placeholder primary color */
+    box-shadow: 0 0 0 3px rgba(74, 105, 189, 0.2); /* Use a placeholder primary color */
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.submit-btn {
+    padding: 0.75rem 1.5rem;
+    background-color: var(--primary-color, #4a69bd); /* Use a placeholder primary color */
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s, box-shadow 0.2s;
+    align-self: flex-end; /* Align button to the right */
+}
+
+.submit-btn:hover {
+    background-color: #3b57a0; /* Darker shade of primary color */
+    box-shadow: var(--shadow);
 }
