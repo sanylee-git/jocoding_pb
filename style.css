@@ -1,15 +1,15 @@
 :root {
-    --background-color: #f0f2f5;
+    --background-color: #f8f9fa;
     --card-background: #ffffff;
-    --text-color: #1c1e21;
-    --primary-color: #4a69bd;
-    --secondary-text-color: #65676b;
-    --highlight-color: #e7f3ff;
-    --border-color: #dddfe2;
+    --text-color: #212529;
+    --muted-text-color: #adb5bd;
+    --header-text-color: #495057;
+    --accent-color: #cfe2ff;
+    --accent-text-color: #004085;
+    --border-color: #dee2e6;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    --border-radius: 0.5rem;
     --font-family: 'Inter', sans-serif;
-    --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.1);
-    --shadow-deep: 0 8px 24px rgba(0, 0, 0, 0.15);
-    --border-radius: 12px;
 }
 
 *, *::before, *::after {
@@ -18,83 +18,87 @@
     padding: 0;
 }
 
-html {
+body {
     font-family: var(--font-family);
     background-color: var(--background-color);
     color: var(--text-color);
-}
-
-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
     padding: 1rem;
 }
 
-#app-container {
-    width: 100%;
-    max-width: 420px;
-    background: var(--card-background);
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow-deep);
-    padding: 2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
+.app-container {
+    max-width: 1600px;
+    margin: 0 auto;
 }
 
 .app-header {
-    text-align: center;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 1.5rem;
-}
-
-#selected-date-display {
-    color: var(--secondary-text-color);
-    font-size: 1rem;
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-}
-
-#cw-display {
-    color: var(--primary-color);
-    font-size: 3rem;
-    font-weight: 700;
-    line-height: 1.1;
-}
-
-.year-selector {
     display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 0.5rem;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background-color: var(--card-background);
+    border-radius: var(--border-radius);
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow);
 }
 
-.year-selector button {
-    font-family: var(--font-family);
-    font-size: 0.875rem;
-    font-weight: 500;
-    padding: 0.5rem 1rem;
+.header-content {
+    text-align: center;
+}
+
+#current-year-display {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--header-text-color);
+}
+
+#selected-week-display {
+    font-size: 1rem;
+    color: var(--muted-text-color);
+    margin-top: 0.25rem;
+}
+
+.year-nav-btn {
+    background: transparent;
     border: 1px solid var(--border-color);
-    border-radius: 20px;
-    background-color: transparent;
-    color: var(--secondary-text-color);
+    border-radius: 50%;
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1.25rem;
+    color: var(--header-text-color);
     cursor: pointer;
-    transition: all 0.2s ease-in-out;
+    transition: background-color 0.2s, color 0.2s;
 }
 
-.year-selector button:hover {
-    background-color: var(--highlight-color);
-    border-color: var(--primary-color);
-    color: var(--primary-color);
+.year-nav-btn:hover {
+    background-color: #e9ecef;
 }
 
-.year-selector button.active {
-    background-color: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
-    box-shadow: var(--shadow-soft);
+#calendar-grid-container {
+    display: grid;
+    gap: 1.5rem;
+    /* Responsive Grid */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 }
 
-/* Styles for the calendar-view component will be defined within its shadow DOM */
+@media (min-width: 1400px) {
+    #calendar-grid-container {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1399px) {
+    #calendar-grid-container {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+
+/* Styles for the month-calendar component will be defined within its shadow DOM */
+/* But we can define a basic card style here */
+month-calendar {
+    display: block;
+    background-color: var(--card-background);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: 1rem;
+}

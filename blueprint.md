@@ -1,58 +1,68 @@
-# Project Blueprint: CW (Current Week) Viewer
+# Project Blueprint: Yearly Week Selector Component
 
 ## 1. Overview
 
-This project is a single-page web application designed to calculate and display the ISO 8601 week number (CW) for any selected date. It provides a user-friendly interface to navigate through years and select dates, focusing on a clean design and intuitive user experience. The application will cover a range of 11 years (the current year ±5 years).
+This project is evolving from a simple CW viewer into a professional, reusable **Yearly Week Selector** component. It is designed for use in data analytics dashboards where users need to filter time-series data by selecting a specific week.
+
+The component displays a full year at a glance, with all 12 months presented as individual cards in a responsive grid. The core interaction is centered around selecting an entire week (Monday to Sunday) globally. The design prioritizes a clean, information-dense, and modern SaaS aesthetic.
 
 ## 2. Design & Features
 
-As a senior developer, the goal is to create a polished, robust, and maintainable application.
+The component is being re-imagined as a high-fidelity dashboard element.
 
 ### 2.1. Visual Design
-- **Theme:** Modern, clean, and minimalist.
-- **Layout:** A centered, card-based interface on a subtle background. The layout will be fully responsive and mobile-first.
-- **Color Palette:** A professional palette with a primary accent color.
-  - `--background-color`: `#f0f2f5`
+- **Aesthetic:** Clean, modern, and professional SaaS/data dashboard.
+- **Layout:** A full-width container housing a responsive grid of 12 month cards.
+  - **Desktop:** 4 columns x 3 rows.
+  - **Tablet:** 2 columns.
+  - **Mobile:** 1 column (stacked).
+- **Color Palette:**
+  - `--background-color`: `#f8f9fa` (Soft gray)
   - `--card-background`: `#ffffff`
-  - `--text-color`: `#1c1e21`
-  - `--primary-color`: `#4a69bd`
-  - `--secondary-text-color`: `#65676b`
-  - `--highlight-color`: `#e7f3ff`
-- **Typography:** `Inter` from Google Fonts for its clean and modern look.
+  - `--text-color`: `#212529` (Neutral dark gray)
+  - `--muted-text-color`: `#adb5bd` (For overflow days)
+  - `--header-text-color`: `#495057`
+  - `--accent-color`: `#cfe2ff` (Subtle blue for selection highlight)
+  - `--border-color`: `#dee2e6`
+- **Typography:** A neutral, sans-serif font like 'Inter'. The layout will be dense and information-efficient, using smaller font sizes.
 - **Effects:**
-  - Soft `box-shadow` on the main card and interactive elements to create depth.
-  - Smooth `transition` effects for hover states and layout changes.
-  - A subtle "glow" effect on active/selected elements.
+  - `box-shadow`: Very subtle shadows on cards to lift them from the background.
+  - `border-radius`: Standardized rounded corners for all cards and interactive elements.
 
 ### 2.2. Core Features
-- **Week Display:** A large, prominent display showing the calculated week number for the selected date (e.g., "CW 35").
-- **Year Selector:** A dynamic list of buttons for the relevant years (2021-2031). The current year will be highlighted.
-- **Calendar Component:** A custom `<calendar-view>` Web Component will display a monthly calendar.
-  - The current date will be highlighted by default.
-  - The selected date will be clearly marked.
-  - Users can navigate between months.
-- **Responsiveness:** The layout will seamlessly adapt to all screen sizes, from mobile phones to desktop monitors.
+- **Main Header:** A global header will display the current year and the selected week.
+  - e.g., `<h2>2026</h2><p>Selected: CW 35</p>`
+- **Year Navigation:** Simple `<` and `>` icon buttons to navigate between years.
+- **Month Cards (`<month-calendar>`):**
+  - Each card represents one month and is a custom Web Component.
+  - **Header:** Displays the month name (e.g., "February").
+  - **Calendar Table:**
+    - **Week Starts Monday:** Adheres to the ISO-8601 standard.
+    - **Columns:** The table will have 8 columns: `CW | Mo | Tu | We | Th | Fr | Sa | Su`.
+    - **Week Numbers:** The first column of each row will display the ISO week number.
+    - **Overflow Days:** Days from adjacent months that complete a week are displayed with muted text.
+- **Interaction:**
+  - **Global Week Selection:** Clicking any part of a week row (`<tr>`) selects that week across the entire application.
+  - **Single Source of Truth:** Only one week can be active at any time.
+  - **Output:** The component's state (selected year and week number) is clearly displayed in the main header.
 
 ## 3. Architecture & Implementation
 
-The application will be built using modern, framework-less web standards, adhering to the guidelines in `GEMINI.md`.
+The architecture will be refactored to support the new component-based, full-year view.
 
-- **HTML (`index.html`):** The main entry point, containing the structure and linking to CSS/JS. It will use the `<calendar-view>` custom element.
-- **CSS (`style.css`):** Modern CSS features will be used for styling.
-  - **CSS Variables:** For easy theming and maintenance.
-  - **Flexbox & Grid:** For robust and responsive layouts.
-  - **Logical Properties:** For better internationalization support.
+- **HTML (`index.html`):** Provides the main application shell, including the header, year navigation controls, and a grid container for the month cards.
+- **CSS (`style.css`):** Completely rewritten to implement the new responsive grid, card styling, and overall SaaS dashboard aesthetic.
 - **JavaScript (`main.js`):**
-  - **Web Components:** The UI will be structured using a `CalendarView` custom element for encapsulation and reusability. This component will manage its own state and rendering via the Shadow DOM.
-  - **ES Modules:** The code will be organized logically.
-  - **ISO 8601 Week Logic:** A dedicated function `getISOWeek(date)` will accurately calculate the week number.
+  - **`<month-calendar>` Web Component:** A new, highly specialized component to render a single month's calendar based on the new requirements. It will manage its own rendering but will be controlled by global state.
+  - **Global State Management:** The main script will manage the `currentYear` and `selectedWeek` (e.g., `{year, weekNumber}`).
+  - **Event-Driven:** The `<month-calendar>` components will emit a `week-selected` event. The main script will listen for this, update the global state, and then instruct all 12 components to re-synchronize their display to show the new selection.
 
 ## 4. Current Development Plan
 
-1.  **[completed]** Create a `blueprint.md` file to outline the project plan.
-2.  **[in_progress]** Structure the main `index.html` file.
-3.  **[pending]** Develop the core layout and styles in `style.css`.
-4.  **[pending]** Create a `CalendarView` Web Component in `main.js`.
-5.  **[pending]** Implement the ISO 8601 week calculation logic.
-6.  **[pending]** Add UI controls and connect the application logic.
-7.  **[pending]** Finalize and polish the design and user experience.
+1.  **[completed]** Update the `blueprint.md` file with the new project vision.
+2.  **[in_progress]** Restructure `index.html` for the yearly grid view.
+3.  **[pending]** Rewrite `style.css` for the new SaaS dashboard aesthetic.
+4.  **[pending]** Create a new `<month-calendar>` Web Component in `main.js`.
+5.  **[pending]** Implement new calendar logic (Monday start, week numbers, overflow days).
+6.  **[pending]** Manage global week selection state and interactions.
+7.  **[pending]** Deploy the final component.

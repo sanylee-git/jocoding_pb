@@ -3,26 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CW (Current Week) Viewer</title>
+    <title>Yearly Week Selector</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <main id="app-container">
+    <div class="app-container">
         <header class="app-header">
-            <p id="selected-date-display">오늘</p>
-            <h1 id="cw-display">CW --</h1>
+            <button id="prev-year" class="year-nav-btn">&lt;</button>
+            <div class="header-content">
+                <h2 id="current-year-display">2026</h2>
+                <p id="selected-week-display">선택된 주 없음</p>
+            </div>
+            <button id="next-year" class="year-nav-btn">&gt;</button>
         </header>
 
-        <div id="year-selector" class="year-selector">
-            <!-- Year buttons will be dynamically inserted here -->
-        </div>
+        <main id="calendar-grid-container">
+            <!-- Month calendar components will be dynamically inserted here -->
+        </main>
+    </div>
 
-        <calendar-view></calendar-view>
-
-    </main>
     <script src="main.js" type="module"></script>
 </body>
 </html>

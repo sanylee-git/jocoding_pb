@@ -1,142 +1,4 @@
-class CalendarView extends HTMLElement {
-    constructor() {
-        super();
-        this.attachShadow({ mode: 'open' });
-        this._date = new Date();
-        this._selectedDate = new Date();
-    }
-
-    connectedCallback() {
-        this.render();
-    }
-
-    get date() {
-        return this._date;
-    }
-
-    set date(val) {
-        this._date = val;
-        this.render();
-    }
-    
-    get selectedDate() {
-        return this._selectedDate;
-    }
-
-    set selectedDate(val) {
-        this._selectedDate = val;
-        this.render();
-    }
-
-    render() {
-        const year = this._date.getFullYear();
-        const month = this._date.getMonth();
-        const firstDay = new Date(year, month, 1);
-        const lastDay = new Date(year, month + 1, 0);
-
-        const monthNames = ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"];
-
-        let dayCells = '';
-        // Add empty cells for days before the 1st of the month
-        for (let i = 0; i < firstDay.getDay(); i++) {
-            dayCells += `<div class="day-cell empty"></div>`;
-        }
-
-        for (let i = 1; i <= lastDay.getDate(); i++) {
-            const currentDate = new Date(year, month, i);
-            const isSelected = this._selectedDate && currentDate.toDateString() === this._selectedDate.toDateString();
-            dayCells += `<div class="day-cell ${isSelected ? 'selected' : ''}" data-date="${currentDate.toISOString()}">${i}</div>`;
-        }
-
-        this.shadowRoot.innerHTML = `
-            <style>
-                /* Add all the component-specific styles here */
-                :host {
-                    display: block;
-                }
-                .calendar-header {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    margin-bottom: 1rem;
-                }
-                .calendar-header button {
-                    background: none;
-                    border: none;
-                    font-size: 1.5rem;
-                    cursor: pointer;
-                    color: var(--primary-color, #4a69bd);
-                }
-                .month-display {
-                    font-size: 1.2rem;
-                    font-weight: 500;
-                }
-                .calendar-grid {
-                    display: grid;
-                    grid-template-columns: repeat(7, 1fr);
-                    gap: 0.5rem;
-                }
-                .day-header, .day-cell {
-                    text-align: center;
-                    padding: 0.5rem;
-                }
-                .day-header {
-                    font-weight: 500;
-                    color: var(--secondary-text-color, #65676b);
-                    font-size: 0.8rem;
-                }
-                .day-cell {
-                    cursor: pointer;
-                    border-radius: 50%;
-                    transition: background-color 0.2s, color 0.2s;
-                }
-                .day-cell:not(.empty):hover {
-                    background-color: var(--highlight-color, #e7f3ff);
-                }
-                .day-cell.selected {
-                    background-color: var(--primary-color, #4a69bd);
-                    color: white;
-                    font-weight: 500;
-                }
-            </style>
-            <div class="calendar-container">
-                <div class="calendar-header">
-                    <button id="prev-month">&lt;</button>
-                    <span class="month-display">${year}년 ${monthNames[month]}</span>
-                    <button id="next-month">&gt;</button>
-                </div>
-                <div class="calendar-grid">
-                    ${['일', '월', '화', '수', '목', '금', '토'].map(d => `<div class="day-header">${d}</div>`).join('')}
-                    ${dayCells}
-                </div>
-            </div>
-        `;
-
-        this.shadowRoot.getElementById('prev-month').onclick = () => {
-            const newDate = new Date(this.date.getFullYear(), this.date.getMonth() - 1, 1);
-            this.date = newDate;
-            this.dispatchEvent(new CustomEvent('month-changed', { detail: newDate }));
-        };
-        this.shadowRoot.getElementById('next-month').onclick = () => {
-            const newDate = new Date(this.date.getFullYear(), this.date.getMonth() + 1, 1);
-            this.date = newDate;
-            this.dispatchEvent(new CustomEvent('month-changed', { detail: newDate }));
-        };
-
-        this.shadowRoot.querySelectorAll('.day-cell:not(.empty)').forEach(cell => {
-            cell.onclick = (e) => {
-                const newSelectedDate = new Date(e.target.dataset.date);
-                this.selectedDate = newSelectedDate;
-                this.dispatchEvent(new CustomEvent('date-selected', { detail: newSelectedDate }));
-            };
-        });
-    }
-}
-customElements.define('calendar-view', CalendarView);
-
-
-// --- Main Application Logic ---
-
+// --- Helper Functions ---
 function getISOWeek(date) {
     const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
     const dayNum = d.getUTCDay() || 7;
@@ -145,67 +7,166 @@ function getISOWeek(date) {
     return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
 }
 
+// --- Web Component: <month-calendar> ---
+class MonthCalendar extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+        this._year = new Date().getFullYear();
+        this._month = 0;
+        this._selectedWeek = null;
+    }
+
+    static get observedAttributes() {
+        return ['year', 'month', 'selected-week'];
+    }
+
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (oldValue === newValue) return;
+        if (name === 'year') this._year = parseInt(newValue);
+        if (name === 'month') this._month = parseInt(newValue);
+        if (name === 'selected-week') this._selectedWeek = newValue;
+        this.render();
+    }
+
+    render() {
+        const monthNames = ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"];
+        const monthName = monthNames[this._month];
+
+        // --- Calendar Logic ---
+        const firstDateOfMonth = new Date(this._year, this._month, 1);
+        const startDay = firstDateOfMonth.getDay() === 0 ? 6 : firstDateOfMonth.getDay() - 1; // 0=Mon, 6=Sun
+        
+        let currentDate = new Date(firstDateOfMonth);
+        currentDate.setDate(currentDate.getDate() - startDay);
+
+        let weeksHtml = '';
+        let done = false;
+        while (!done) {
+            let weekRowHtml = '';
+            let daysInWeek = [];
+            
+            for (let i = 0; i < 7; i++) {
+                daysInWeek.push(new Date(currentDate));
+                weekRowHtml += `<td class="${currentDate.getMonth() !== this._month ? 'muted' : ''}">${currentDate.getDate()}</td>`;
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+            
+            const weekNumber = getISOWeek(daysInWeek[0]);
+            const yearOfWeek = daysInWeek[0].getFullYear();
+            const weekId = `${yearOfWeek}-${weekNumber}`;
+            const isSelected = this._selectedWeek === weekId;
+
+            weeksHtml += `
+                <tr class="week-row ${isSelected ? 'selected' : ''}" data-week-id="${weekId}">
+                    <td class="week-number">${weekNumber}</td>
+                    ${weekRowHtml}
+                </tr>
+            `;
+
+            if (currentDate.getMonth() > this._month && currentDate.getFullYear() >= this._year || (currentDate.getMonth() === 0 && this._month === 11)) {
+                done = true;
+            }
+        }
+
+        // --- Component HTML & CSS ---
+        this.shadowRoot.innerHTML = `
+            <style>
+                :host { display: block; }
+                .calendar-card { font-size: 0.875rem; }
+                .month-header { font-size: 1rem; font-weight: 600; text-align: center; margin-bottom: 1rem; }
+                table { width: 100%; border-collapse: collapse; }
+                th, td { text-align: center; padding: 0.5rem 0; }
+                th { font-weight: 500; color: var(--header-text-color, #495057); font-size: 0.75rem; }
+                .week-number { color: var(--muted-text-color, #adb5bd); font-weight: 500; }
+                .muted { color: var(--muted-text-color, #adb5bd); }
+                .week-row { cursor: pointer; transition: background-color 0.15s; }
+                .week-row:hover { background-color: #f1f3f5; }
+                .week-row.selected {
+                    background-color: var(--accent-color, #cfe2ff);
+                    color: var(--accent-text-color, #004085);
+                    font-weight: 600;
+                }
+                .week-row.selected .week-number { color: var(--accent-text-color, #004085); }
+            </style>
+            <div class="calendar-card">
+                <h3 class="month-header">${monthName}</h3>
+                <table>
+                    <thead>
+                        <tr><th>CW</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th><th>일</th></tr>
+                    </thead>
+                    <tbody>
+                        ${weeksHtml}
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        // --- Event Listeners ---
+        this.shadowRoot.querySelectorAll('.week-row').forEach(row => {
+            row.addEventListener('click', () => {
+                this.dispatchEvent(new CustomEvent('week-selected', {
+                    bubbles: true,
+                    composed: true,
+                    detail: { weekId: row.dataset.weekId }
+                }));
+            });
+        });
+    }
+}
+customElements.define('month-calendar', MonthCalendar);
+
+// --- Main Application Logic ---
 document.addEventListener('DOMContentLoaded', () => {
-    const cwDisplay = document.getElementById('cw-display');
-    const selectedDateDisplay = document.getElementById('selected-date-display');
-    const yearSelector = document.getElementById('year-selector');
-    const calendarView = document.querySelector('calendar-view');
+    const yearDisplay = document.getElementById('current-year-display');
+    const weekDisplay = document.getElementById('selected-week-display');
+    const prevYearBtn = document.getElementById('prev-year');
+    const nextYearBtn = document.getElementById('next-year');
+    const gridContainer = document.getElementById('calendar-grid-container');
 
     let currentYear = new Date().getFullYear();
+    let selectedWeekId = null;
 
-    function updateDisplay(date) {
-        const week = getISOWeek(date);
-        cwDisplay.textContent = `CW ${week}`;
-        
-        const today = new Date();
-        if (date.toDateString() === today.toDateString()) {
-             selectedDateDisplay.textContent = '오늘';
-        } else {
-             selectedDateDisplay.textContent = date.toLocaleDateString('ko-KR', {
-                year: 'numeric', month: 'long', day: 'numeric' 
-            });
-        }
-    }
-    
-    function setupYearSelector() {
-        yearSelector.innerHTML = '';
-        for (let i = -5; i <= 5; i++) {
-            const year = currentYear + i;
-            const btn = document.createElement('button');
-            btn.textContent = year;
-            btn.onclick = () => {
-                const newDate = new Date(year, calendarView.date.getMonth(), 1);
-                calendarView.date = newDate;
-                document.querySelector('.year-selector button.active').classList.remove('active');
-                btn.classList.add('active');
-            };
-            if (year === calendarView.date.getFullYear()) {
-                btn.classList.add('active');
+    function renderYear(year) {
+        yearDisplay.textContent = year;
+        gridContainer.innerHTML = '';
+        for (let i = 0; i < 12; i++) {
+            const monthCard = document.createElement('month-calendar');
+            monthCard.setAttribute('year', year);
+            monthCard.setAttribute('month', i);
+            if (selectedWeekId) {
+                monthCard.setAttribute('selected-week', selectedWeekId);
             }
-            yearSelector.appendChild(btn);
+            gridContainer.appendChild(monthCard);
         }
     }
 
-    calendarView.addEventListener('date-selected', (e) => {
-        updateDisplay(e.detail);
+    function updateSelection(weekId) {
+        selectedWeekId = weekId;
+        const [year, week] = weekId.split('-');
+        weekDisplay.textContent = `선택: ${year}년 CW${week}`;
+        
+        // Propagate selection to all child components
+        gridContainer.querySelectorAll('month-calendar').forEach(cal => {
+            cal.setAttribute('selected-week', selectedWeekId);
+        });
+    }
+
+    // --- Event Listeners ---
+    prevYearBtn.addEventListener('click', () => {
+        currentYear--;
+        renderYear(currentYear);
     });
 
-    calendarView.addEventListener('month-changed', (e) => {
-        const year = e.detail.getFullYear();
-        const activeButton = document.querySelector('.year-selector button.active');
-        if (activeButton) {
-            activeButton.classList.remove('active');
-        }
-        const newActiveButton = Array.from(yearSelector.querySelectorAll('button')).find(btn => btn.textContent == year);
-        if (newActiveButton) {
-            newActiveButton.classList.add('active');
-        }
+    nextYearBtn.addEventListener('click', () => {
+        currentYear++;
+        renderYear(currentYear);
     });
 
-    // Initial setup
-    const today = new Date();
-    calendarView.date = today;
-    calendarView.selectedDate = today;
-    updateDisplay(today);
-    setupYearSelector();
+    gridContainer.addEventListener('week-selected', (e) => {
+        updateSelection(e.detail.weekId);
+    });
+
+    // --- Initial Render ---
+    renderYear(currentYear);
 });
