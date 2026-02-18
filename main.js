@@ -121,12 +121,16 @@ class MonthCalendar extends HTMLElement {
             const weekId = `${yearOfWeek}-${weekNumber}`;
             const isSelected = this._selectedWeek === weekId;
 
-            weeksHtml += `
-                <tr class="week-row ${isSelected ? 'selected' : ''}" data-week-id="${weekId}">
-                    <td class="week-number">${weekNumber}</td>
-                    ${weekRowHtml}
-                </tr>
-            `;
+            if(this._month === 11 && weekNumber === 1) {
+                // Skip rendering week 1 of next year in December
+            } else {
+                weeksHtml += `
+                    <tr class="week-row ${isSelected ? 'selected' : ''}" data-week-id="${weekId}">
+                        <td class="week-number">${weekNumber}</td>
+                        ${weekRowHtml}
+                    </tr>
+                `;
+            }
             
             // Move to the next day to start the new week
             currentDate.setUTCDate(currentDate.getUTCDate() + 1);
@@ -134,6 +138,7 @@ class MonthCalendar extends HTMLElement {
             if (this._month === 11) { // December
                 // Stop if the next week is in the next year and the month is January
                 if (currentDate.getUTCFullYear() > this._year && currentDate.getUTCMonth() > 0) done = true;
+                 if (currentDate.getUTCFullYear() > this._year && weekNumber === 1) done = true;
             } else {
                 // Stop if the next week is in a future month
                 if (currentDate.getUTCMonth() > this._month && currentDate.getUTCFullYear() >= this._year) done = true;
