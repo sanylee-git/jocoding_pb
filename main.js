@@ -1,6 +1,7 @@
+
 // --- Helper Functions ---
 function getISOWeek(date) {
-    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
     const dayNum = d.getUTCDay() || 7;
     d.setUTCDate(d.getUTCDate() + 4 - dayNum);
     const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
@@ -33,7 +34,11 @@ function getDatesForWeek(weekId) {
 
 function formatDate(date) {
     if (!date || isNaN(date)) return '';
-    return date.toISOString().split('T')[0];
+    // Use UTC methods to avoid timezone shift issues when formatting the date string
+    const year = date.getUTCFullYear();
+    const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+    const day = date.getUTCDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
 }
 
 // --- Web Component: <month-calendar> ---
@@ -44,7 +49,7 @@ class MonthCalendar extends HTMLElement {
         this._year = new Date().getFullYear();
         this._month = 0;
         this._selectedWeek = null;
-        this.isReady = false; // Add a ready flag
+        this.isReady = false;
     }
 
     connectedCallback() {
@@ -62,7 +67,7 @@ class MonthCalendar extends HTMLElement {
         if (name === 'year') this._year = parseInt(newValue);
         if (name === 'month') this._month = parseInt(newValue);
         if (name === 'selected-week') this._selectedWeek = newValue;
-        if (this.isReady) { // Only render if component is ready
+        if (this.isReady) {
             this.render();
         }
     }
@@ -74,11 +79,12 @@ class MonthCalendar extends HTMLElement {
         const krHolidays = holidays[this._year]?.KR || [];
         const holidayMap = new Map(krHolidays.map(h => [h.date, h.name]));
 
-        const firstDateOfMonth = new Date(this._year, this._month, 1);
-        const startDay = firstDateOfMonth.getDay() === 0 ? 6 : firstDateOfMonth.getDay() - 1;
+        // Use UTC dates for all calculations to prevent timezone-related offsets
+        const firstDateOfMonth = new Date(Date.UTC(this._year, this._month, 1));
+        const startDay = firstDateOfMonth.getUTCDay() === 0 ? 6 : firstDateOfMonth.getUTCDay() - 1;
         
         let currentDate = new Date(firstDateOfMonth);
-        currentDate.setDate(currentDate.getDate() - startDay);
+        currentDate.setUTCDate(currentDate.getUTCDate() - startDay);
 
         let weeksHtml = '';
         let done = false;
@@ -86,13 +92,15 @@ class MonthCalendar extends HTMLElement {
             let weekRowHtml = '';
             let daysInWeek = [];
             
+            const firstDayOfWeek = new Date(currentDate);
+            daysInWeek.push(firstDayOfWeek);
+
             for (let i = 0; i < 7; i++) {
-                daysInWeek.push(new Date(currentDate));
-                const dayOfWeek = currentDate.getDay();
+                const dayOfWeek = currentDate.getUTCDay();
                 const dateString = formatDate(currentDate);
                 
                 let classes = [];
-                if (currentDate.getMonth() !== this._month) classes.push('muted');
+                if (currentDate.getUTCMonth() !== this._month) classes.push('muted');
                 if (dayOfWeek === 6) classes.push('saturday');
                 if (dayOfWeek === 0) classes.push('sunday');
                 
@@ -100,12 +108,16 @@ class MonthCalendar extends HTMLElement {
                 if (holidayName) classes.push('holiday');
 
                 const holidayNameHtml = holidayName ? `<div class="holiday-name">${holidayName}</div>` : '';
-                weekRowHtml += `<td class="${classes.join(' ')}"><div>${currentDate.getDate()}</div>${holidayNameHtml}</td>`;
-                currentDate.setDate(currentDate.getDate() + 1);
+                weekRowHtml += `<td class="${classes.join(' ')}"><div>${currentDate.getUTCDate()}</div>${holidayNameHtml}</td>`;
+                
+                if (i < 6) { // Add next day to daysInWeek array
+                   currentDate.setUTCDate(currentDate.getUTCDate() + 1);
+                   daysInWeek.push(new Date(currentDate));
+                }
             }
             
-            const weekNumber = getISOWeek(daysInWeek[0]);
-            const yearOfWeek = daysInWeek[0].getFullYear();
+            const weekNumber = getISOWeek(firstDayOfWeek);
+            const yearOfWeek = firstDayOfWeek.getUTCFullYear();
             const weekId = `${yearOfWeek}-${weekNumber}`;
             const isSelected = this._selectedWeek === weekId;
 
@@ -115,12 +127,18 @@ class MonthCalendar extends HTMLElement {
                     ${weekRowHtml}
                 </tr>
             `;
+            
+            // Move to the next day to start the new week
+            currentDate.setUTCDate(currentDate.getUTCDate() + 1);
 
-            if (this._month === 11) {
-                if (currentDate.getFullYear() > this._year) done = true;
+            if (this._month === 11) { // December
+                // Stop if the next week is in the next year and the month is January
+                if (currentDate.getUTCFullYear() > this._year && currentDate.getUTCMonth() > 0) done = true;
             } else {
-                if (currentDate.getMonth() > this._month && currentDate.getFullYear() >= this._year) done = true;
+                // Stop if the next week is in a future month
+                if (currentDate.getUTCMonth() > this._month && currentDate.getUTCFullYear() >= this._year) done = true;
             }
+             if (weeksHtml.length > 4000) done = true; // Safety break
         }
 
         this.shadowRoot.innerHTML = `
@@ -129,14 +147,19 @@ class MonthCalendar extends HTMLElement {
                 .calendar-card { font-size: 0.875rem; }
                 .month-header { font-size: 1rem; font-weight: 600; text-align: center; margin-bottom: 1rem; color: var(--header-text-color); }
                 table { width: 100%; border-collapse: collapse; }
-                th, td { text-align: center; padding: 0.5rem 0.2rem; vertical-align: top; height: 4em; }
+                th, td { text-align: center; padding: 0.4rem 0.2rem; vertical-align: top; height: 3.8em; }
                 th { font-weight: 500; color: var(--muted-text-color); font-size: 0.75rem; }
                 td > div:first-child { margin-bottom: 4px; }
-                .week-number { color: var(--muted-text-color); font-weight: 500; vertical-align: middle; }
+                .week-number { 
+                    color: var(--muted-text-color); 
+                    font-weight: 500; 
+                    vertical-align: top;
+                    padding-top: 0.4rem;
+                }
                 .muted { color: var(--muted-text-color); opacity: 0.5; }
                 .saturday { color: var(--saturday-color); }
                 .sunday, .holiday > div:first-child { color: var(--sunday-holiday-color); font-weight: 600; }
-                .holiday-name { font-size: 0.65rem; font-weight: 400; color: var(--sunday-holiday-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 45px; margin: 0 auto; }
+                .holiday-name { font-size: 0.6rem; font-weight: 400; color: var(--sunday-holiday-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 45px; margin: 0 auto; }
                 .week-row { cursor: pointer; transition: background-color 0.15s; }
                 .week-row:hover { background-color: var(--accent-color); }
                 .week-row.selected { background-color: var(--primary-color); color: white; font-weight: 600; }
@@ -182,19 +205,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const calendarPromises = [];
         for (let i = 0; i < 12; i++) {
             const monthCard = document.createElement('month-calendar');
-            calendarPromises.push(customElements.whenDefined('month-calendar').then(() => {
-                return new Promise(resolve => {
-                    monthCard.addEventListener('ready', () => resolve(monthCard), { once: true });
-                });
+            calendarPromises.push(new Promise(resolve => {
+                monthCard.addEventListener('ready', () => resolve(monthCard), { once: true });
             }));
             monthCard.setAttribute('year', year);
             monthCard.setAttribute('month', i);
+            if (selectedWeekId) {
+                monthCard.setAttribute('selected-week', selectedWeekId);
+            }
             gridContainer.appendChild(monthCard);
         }
         return Promise.all(calendarPromises);
     }
 
     function updateSelection(weekId) {
+        if (!weekId) return;
         selectedWeekId = weekId;
         const [year, week] = weekId.split('-');
         const dates = getDatesForWeek(weekId);
@@ -213,25 +238,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Event Listeners ---
     prevYearBtn.addEventListener('click', () => { 
         currentYear--; 
-        renderYear(currentYear).then(() => {
-            if (selectedWeekId) {
-                const [selectedYear] = selectedWeekId.split('-');
-                if (currentYear == selectedYear) {
-                    updateSelection(selectedWeekId);
-                }
-            }
-        });
+        renderYear(currentYear);
     });
     nextYearBtn.addEventListener('click', () => { 
         currentYear++; 
-        renderYear(currentYear).then(() => {
-             if (selectedWeekId) {
-                const [selectedYear] = selectedWeekId.split('-');
-                if (currentYear == selectedYear) {
-                    updateSelection(selectedWeekId);
-                }
-            }
-        });
+        renderYear(currentYear);
     });
     gridContainer.addEventListener('week-selected', (e) => { 
         updateSelection(e.detail.weekId); 
@@ -239,7 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Initial Render & Selection ---
     async function initializeCalendar() {
-        await renderYear(currentYear);
+        // Set initial selection without waiting for render to feel faster
         const today = new Date();
         const todayYear = today.getFullYear();
         if (currentYear === todayYear) {
@@ -247,6 +258,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const currentWeekId = `${todayYear}-${currentWeekNumber}`;
             updateSelection(currentWeekId);
         }
+        
+        await renderYear(currentYear);
     }
 
     initializeCalendar();
