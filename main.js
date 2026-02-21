@@ -76,8 +76,9 @@ class MonthCalendar extends HTMLElement {
         const monthKeys = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
         const monthName = window.i18n.t('calendar.month.' + monthKeys[this._month]);
 
-        const krHolidays = holidays[this._year]?.KR || [];
-        const holidayMap = new Map(krHolidays.map(h => [h.date, h.name]));
+        const country = (document.documentElement.dataset.lang === 'en') ? 'US' : 'KR';
+        const countryHolidays = holidays[this._year]?.[country] || [];
+        const holidayMap = new Map(countryHolidays.map(h => [h.date, h.name]));
 
         // Use UTC dates for all calculations to prevent timezone-related offsets
         const firstDateOfMonth = new Date(Date.UTC(this._year, this._month, 1));
