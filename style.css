@@ -383,6 +383,156 @@ body {
     justify-content: flex-end;
 }
 
+/* === SNS 공유 버튼 === */
+
+/* FAB (Floating Action Button) */
+.share-fab {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 200;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: flex-end;
+    gap: 0.5rem;
+}
+
+.share-fab-btn {
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 18px rgba(0, 123, 255, 0.45);
+    transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+    flex-shrink: 0;
+}
+
+.share-fab-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 22px rgba(0, 123, 255, 0.6);
+}
+
+.share-fab.open .share-fab-btn {
+    background: var(--accent-text-color);
+    transform: rotate(15deg);
+}
+
+/* Share Panel */
+.share-panel {
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: 1rem;
+    padding: 0.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    min-width: 178px;
+    opacity: 0;
+    transform: translateY(10px) scale(0.92);
+    transform-origin: bottom right;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.share-fab.open .share-panel {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+.share-item-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.55rem 0.75rem;
+    border: none;
+    background: transparent;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-family: var(--font-family);
+    color: var(--text-color);
+    transition: background-color 0.15s, color 0.15s;
+    width: 100%;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.share-item-btn:hover {
+    background: var(--accent-color);
+    color: var(--accent-text-color);
+}
+
+html[data-theme="dark"] .share-btn-x svg { color: #e0e0e0; }
+.share-btn-facebook svg { color: #1877f2; }
+.share-btn-copy.copied svg { stroke: #22c55e; }
+.share-btn-copy.copied span { color: #22c55e; }
+
+/* Hero Share Button */
+.hero-share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    padding: 0.65rem 1.5rem;
+    background: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: 2rem;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-family: var(--font-family);
+    font-weight: 500;
+    box-shadow: 0 4px 14px rgba(0, 123, 255, 0.35);
+    transition: background-color 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+
+.hero-share-btn:hover {
+    background: var(--accent-text-color);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.5);
+}
+
+.hero-share-btn:active {
+    transform: translateY(0);
+}
+
+/* Week Share Button (달력 주 선택 시) */
+.week-share-btn {
+    display: none;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.5rem;
+    padding: 0.3rem 0.8rem;
+    background: transparent;
+    border: 1px solid var(--primary-color);
+    border-radius: 1rem;
+    cursor: pointer;
+    font-size: 0.78rem;
+    font-family: var(--font-family);
+    color: var(--primary-color);
+    transition: background-color 0.15s;
+}
+
+.week-share-btn:hover {
+    background: var(--accent-color);
+}
+
+@media (max-width: 767px) {
+    .share-fab {
+        bottom: 1.25rem;
+        right: 1.25rem;
+    }
+    .share-fab-btn {
+        width: 3rem;
+        height: 3rem;
+    }
+}
+
 /* === FAQ / Q&A 섹션 === */
 .faq-section {
     grid-column: 1 / -1;
